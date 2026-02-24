@@ -132,12 +132,11 @@ if len(ready_tasks) == 0:
 
 When all tasks are complete:
 
-**1. Stage all implementation changes and get the file list:**
+**1. Get the list of changed files:**
 ```bash
-git add -A
-git diff --name-only --cached
+git add -A && git diff --name-only --cached && git reset HEAD
 ```
-This stages all implementation work (nothing has been committed yet) and lists the changed files. The staged snapshot preserves the boundary between implementation and standards fixes.
+This temporarily stages everything to get the file list, then unstages. Nothing is committed yet.
 
 **2. Split files into batches** of ~10 files each.
 
@@ -168,40 +167,33 @@ All Task tool calls MUST be made in a SINGLE message to enable parallel executio
 
 **4. After ALL enforcers return `BATCH_ENFORCED`, run validation:**
 ```bash
-# Run lint
-{lint command from code-standards.md or testing.md}
-
 # Run full test suite
 {parallel test command from testing.md}
 ```
 
 > **CRITICAL: Nothing is committed until AFTER the full test suite passes.** This ensures no non-standard or broken code is ever committed.
 
-**5. On lint/tests passing:**
-1. Commit the staged implementation changes (staged before standards enforcement ran):
-   ```bash
-   git commit -m "feat({plan-name}): {plan title summary}"
-   ```
-2. If standards enforcement made additional changes (unstaged), commit them:
-   ```bash
-   git add -A && git diff --cached --quiet || git commit -m "style({plan-name}): apply coding standards"
-   ```
-3. Update `_plan.md` status to `completed`
-4. Output: `ALL_TASKS_COMPLETE`
+**5. On tests passing:**
+Stage everything (implementation + standards fixes together) and make a single commit:
+```bash
+git add -A
+git commit -m "feat({plan-name}): {plan title summary}"
+```
+Then update `_plan.md` status to `completed`, commit that, and output: `ALL_TASKS_COMPLETE`
 
-**6. On lint/test failure:**
-- If tests fail, first check if standards enforcement broke things by reverting unstaged changes:
+**6. On test failure:**
+- Revert only the standards enforcer changes to isolate whether they broke things:
    ```bash
-   git checkout -- .
+   git stash
    ```
-   Then re-run the test suite on just the staged implementation.
-- If implementation tests pass: commit implementation, skip standards fixes, and output:
+   Re-run the test suite on just the implementation.
+- If implementation tests pass: the standards enforcers broke something. Drop the stash, commit implementation only, and output:
    ```
    ALL_TASKS_COMPLETE
 
    WARNING: Code standards enforcement broke tests. Implementation committed without style fixes. Run linting manually.
    ```
-- If implementation tests also fail: a TDD worker produced broken code. Output `TASKS_BLOCKED` with details.
+- If implementation tests also fail: a TDD worker produced broken code. Restore the stash (`git stash pop`) and output `TASKS_BLOCKED` with details.
 
 ### Step 5: Spawn Parallel Workers
 
