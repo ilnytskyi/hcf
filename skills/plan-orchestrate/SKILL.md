@@ -45,19 +45,16 @@ If not found, output error and stop.
 
 ### Step 0: Check for Ralph Wiggum Plugin
 
-Before starting execution, check if the ralph-wiggum plugin is installed:
+Before starting execution, check if the ralph-wiggum plugin is installed by looking at the available skills listed in the system reminder. If skills like `ralph-wiggum:ralph-loop`, `ralph-wiggum:help`, or `ralph-wiggum:cancel-ralph` appear in the available skills list, the plugin is installed.
 
-```bash
-# Check if ralph-wiggum commands are available
-claude plugin list 2>/dev/null | grep -q "ralph-wiggum"
-```
+**Do NOT use `claude plugin list` via Bash** — this command does not work from inside a Claude Code session and will produce false negatives.
 
-**If ralph-wiggum IS installed:**
+**If ralph-wiggum IS installed (skills are listed):**
 - Automatically wrap execution with ralph-wiggum for session persistence
 - Invoke: `/ralph-wiggum:loop "plan-orchestrate {plan-name}" --completion-promise "ALL_TASKS_COMPLETE" --max-iterations 100`
 - This ensures the orchestrator continues even if context limits are reached
 
-**If ralph-wiggum is NOT installed:**
+**If ralph-wiggum is NOT installed (skills are not listed):**
 - Display a warning:
   ```
   WARNING: ralph-wiggum plugin is not installed.
