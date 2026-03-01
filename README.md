@@ -88,8 +88,8 @@ The `plan-orchestrate` skill auto-triggers and **automatically uses ralph-wiggum
 
 ralph-wiggum is prompted during `/project-setup`, or install manually:
 ```bash
-claude plugin marketplace add anthropics/claude-code
-claude plugin install ralph-wiggum@anthropics-claude-code
+/plugin marketplace add anthropics/claude-code
+/plugin install ralph-wiggum@anthropics-claude-code
 ```
 
 ## How It Works

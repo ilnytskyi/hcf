@@ -338,17 +338,17 @@ If yes, run the installation commands:
 
 ```bash
 # Add the Anthropic marketplace (if not already added)
-claude plugin marketplace add anthropics/claude-code
+/plugin marketplace add anthropics/claude-code
 
 # Install ralph-wiggum
-claude plugin install ralph-wiggum@anthropics-claude-code
+/plugin install ralph-wiggum@anthropics-claude-code
 ```
 
 If no, inform them they can install later:
 > You can install it anytime with:
 > ```
-> claude plugin marketplace add anthropics/claude-code
-> claude plugin install ralph-wiggum@anthropics-claude-code
+> /plugin marketplace add anthropics/claude-code
+> /plugin install ralph-wiggum@anthropics-claude-code
 > ```
 
 ### Step 8: Confirm Completion
