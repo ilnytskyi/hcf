@@ -174,11 +174,14 @@ All Task tool calls MUST be made in a SINGLE message to enable parallel executio
 > **CRITICAL: Nothing is committed until AFTER the full test suite passes.** This ensures no non-standard or broken code is ever committed.
 
 **5. On tests passing:**
-Stage everything (implementation + standards fixes together) and make a single commit:
+Stage everything (implementation, standards fixes, AND plan files) and make a single commit:
 ```bash
+git add -A .claude/plans/{plan-name}/
 git add -A
 git commit -m "feat({plan-name}): {plan title summary}"
 ```
+> **IMPORTANT:** The `git add -A .claude/plans/{plan-name}/` ensures the plan files are always included in the commit. These must be committed alongside the implementation they describe.
+
 Then update `_plan.md` status to `completed`, commit that, and output: `ALL_TASKS_COMPLETE`
 
 **6. On test failure:**
