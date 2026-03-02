@@ -314,7 +314,21 @@ Total tasks: {N}
 All tests passing.
 Code standards enforced.
 Commits created: {N}
+
+## What Changed
+
+{Brief, high-level summary of what was built or changed. Write this as a bulleted list
+describing the user-visible outcomes — not implementation details. Derive this from the
+completed task titles and the plan objective. For example:}
+
+- Added visitor name column to the detail table
+- Linked visitor rows to their detail pages
+- Reordered columns to match design spec
+- Added sorting to all new columns
 ```
+
+> **NOTE:** The "What Changed" section should read like release notes — focus on outcomes,
+> not internals. Pull from the plan's objective and completed task summaries.
 
 **Blocked:**
 ```
