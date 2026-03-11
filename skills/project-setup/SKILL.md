@@ -1,4 +1,8 @@
-# /project-setup
+---
+name: project-setup
+description: One-time interactive setup to configure a project for autonomous development. Use when setting up a new project for TDD-based autonomous development with HCF.
+disable-model-invocation: true
+---
 
 One-time interactive setup to configure a project for autonomous development.
 

@@ -9,13 +9,12 @@ Autonomous development plugin for Claude Code. Define requirements with a PM, th
   - [Installation](#installation)
   - [Quick Start](#quick-start)
 - [How It Works](#how-it-works)
-  - [Three Phases](#three-phases)
+  - [Four Phases](#four-phases)
   - [Parallel Execution](#parallel-execution)
   - [TDD Methodology](#tdd-methodology)
 - [Reference](#reference)
   - [Files Created](#files-created)
   - [Task Format](#task-format)
-  - [Commands](#commands)
   - [Skills](#skills)
   - [Outputs](#outputs)
 - [Architecture](#architecture)
@@ -95,7 +94,7 @@ ralph-wiggum is prompted during `/project-setup`, or install manually:
 
 ## How It Works
 
-### Three Phases
+### Four Phases
 
 | Phase | Type | What Happens |
 |-------|------|--------------|
@@ -168,18 +167,15 @@ Create the User model with authentication fields.
 
 Requirements become test names directly.
 
-### Commands
-
-| Command | Description |
-|---------|-------------|
-| `/project-setup` | Configure project (one-time) |
-
 ### Skills
 
-| Skill | Trigger | Description |
-|-------|---------|-------------|
-| `plan-create` | "Help me implement...", "Build a...", etc. | Interactive planning |
-| `plan-orchestrate` | "Run the plan", "Execute", "Start implementation" | Parallel TDD execution |
+All skills can be invoked directly with `/skill-name` or triggered automatically by Claude when your request matches their description.
+
+| Skill | Invocation | Auto-triggers | Description |
+|-------|------------|---------------|-------------|
+| `project-setup` | `/project-setup` | No | Configure project (one-time) |
+| `plan-create` | `/plan-create [description]` | Yes — "Help me implement...", "Build a...", etc. | Interactive planning |
+| `plan-orchestrate` | `/plan-orchestrate [plan-name]` | Yes — "Run the plan", "Execute", "Start implementation" | Parallel TDD execution |
 
 ### Outputs
 
@@ -198,13 +194,13 @@ hcf/
 │   ├── devils-advocate.md    # Plan reviewer - finds gaps before execution (opus)
 │   ├── tdd-worker.md         # TDD implementation worker (sonnet)
 │   └── standards-enforcer.md # Code standards enforcement (sonnet)
-├── commands/
-│   └── project-setup.md      # One-time setup command
 ├── skills/
+│   ├── project-setup/
+│   │   └── SKILL.md          # One-time setup skill (manual invocation only)
 │   ├── plan-create/
-│   │   └── SKILL.md          # Interactive planning skill
+│   │   └── SKILL.md          # Interactive planning skill (auto-triggers)
 │   └── plan-orchestrate/
-│       └── SKILL.md          # Parallel TDD execution skill
+│       └── SKILL.md          # Parallel TDD execution skill (auto-triggers)
 ├── CLAUDE.md                 # Portable CLAUDE.md template for projects
 └── README.md
 ```
@@ -233,10 +229,12 @@ Test the plugin locally without publishing using the `--plugin-dir` flag:
 claude --plugin-dir /path/to/hcf
 ```
 
-Commands are namespaced with the plugin name:
+Skills are namespaced with the plugin name:
 - `/hcf:project-setup`
+- `/hcf:plan-create [description]`
+- `/hcf:plan-orchestrate [plan-name]`
 
-Skills auto-trigger based on their descriptions.
+Skills with `disable-model-invocation: true` (like `project-setup`) require manual invocation. Others auto-trigger based on their descriptions.
 
 ### Testing Workflow
 
@@ -250,18 +248,20 @@ Skills auto-trigger based on their descriptions.
    ```
    /help
    ```
-   Commands and skills should appear under the `hcf` namespace.
+   Skills should appear under the `hcf` namespace.
 
 3. **Test each component:**
    ```bash
-   # Test project setup (command)
+   # Test project setup (direct invocation only)
    /hcf:project-setup
 
-   # Test plan-create skill (auto-triggers on feature requests)
+   # Test plan-create (auto-triggers on feature requests, or invoke directly)
    "Create a plan to implement user authentication"
+   /hcf:plan-create user authentication with JWT
 
-   # Test plan-orchestrate skill (auto-triggers on execution requests)
-   "Run the user-auth plan" or "Execute the plan"
+   # Test plan-orchestrate (auto-triggers on execution requests, or invoke directly)
+   "Run the user-auth plan"
+   /hcf:plan-orchestrate user-auth
    ```
 
 ### Debugging
@@ -280,8 +280,9 @@ claude --plugin-dir ./hcf --plugin-dir ./other-plugin
 
 **Plugin Structure Notes:**
 - Only `plugin.json` goes in `.claude-plugin/`
-- Commands, skills, and other components stay at the plugin root level
-- Skills auto-trigger based on patterns defined in `SKILL.md`
+- Skills, agents, and other components stay at the plugin root level
+- Each skill is a directory with a `SKILL.md` entrypoint
+- Skills auto-trigger based on their `description` frontmatter (unless `disable-model-invocation: true`)
 
 ## Contributing
 
