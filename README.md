@@ -11,6 +11,7 @@ Autonomous development plugin for Claude Code. Define requirements with a PM, th
 - [How It Works](#how-it-works)
   - [Four Phases](#four-phases)
   - [Pipeline](#pipeline)
+  - [Dependency Graph](#dependency-graph)
   - [Parallel Execution](#parallel-execution)
   - [TDD Methodology](#tdd-methodology)
 - [Reference](#reference)
@@ -164,14 +165,31 @@ You are a documentation updater. Your job is to...
 
 The agent name in `pipeline.md` must match the agent's filename (without `.md`). Local agents in `.claude/agents/` override plugin agents with the same name.
 
-### Parallel Execution
+### Dependency Graph
 
-Independent tasks run simultaneously:
+After generating a plan, HCF visualizes the task dependency graph so you can verify parallelism and ordering before execution:
 
 ```
-Batch 1: Tasks 001, 002, 003 (no deps) → 3 parallel workers
-Batch 2: Tasks 004, 005 (depend on batch 1) → 2 parallel workers
-Batch 3: Task 006 (depends on 004, 005) → 1 worker
+001 ─┬─► 002 ─┬─► 005
+     │        │
+     └─► 003 ─┘
+     │
+     └─► 004 ────► 006
+```
+
+This tells the orchestrator which tasks can run in parallel and which must wait. In this example:
+- **Batch 1:** Task 001 (no dependencies)
+- **Batch 2:** Tasks 002, 003, 004 (all depend only on 001)
+- **Batch 3:** Tasks 005, 006 (005 depends on 002+003; 006 depends on 004)
+
+### Parallel Execution
+
+Independent tasks within each batch run simultaneously:
+
+```
+Batch 1: Task 001 (no deps)          → 1 worker
+Batch 2: Tasks 002, 003, 004         → 3 parallel workers
+Batch 3: Tasks 005, 006              → 2 parallel workers
 ```
 
 100 tasks might complete in 5-10 batches instead of 100 sequential runs.
