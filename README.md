@@ -236,6 +236,7 @@ All skills can be invoked directly with `/skill-name` or triggered automatically
 | Skill | Invocation | Auto-triggers | Description |
 |-------|------------|---------------|-------------|
 | `project-setup` | `/project-setup` | No | Configure project (one-time) |
+| `project-update` | `/project-update` | No | Sync config with latest plugin defaults |
 | `plan-create` | `/plan-create [description]` | Yes — "Help me implement...", "Build a...", etc. | Interactive planning |
 | `plan-orchestrate` | `/plan-orchestrate [plan-name]` | Yes — "Run the plan", "Execute", "Start implementation" | Parallel TDD execution |
 
@@ -259,6 +260,8 @@ hcf/
 ├── skills/
 │   ├── project-setup/
 │   │   └── SKILL.md          # One-time setup skill (manual invocation only)
+│   ├── project-update/
+│   │   └── SKILL.md          # Sync project config with plugin updates (manual)
 │   ├── plan-create/
 │   │   └── SKILL.md          # Interactive planning skill (auto-triggers)
 │   └── plan-orchestrate/
