@@ -112,7 +112,7 @@ for each task in tasks:
 **All Complete:**
 ```
 if all(task.status == "completed" for task in tasks):
-    Run Step 4a: Code Standards Enforcement (quality gate before final completion)
+    Run Step 4a: Post-Implementation Pipeline (quality gates before final completion)
     STOP
 ```
 
@@ -126,33 +126,37 @@ if len(ready_tasks) == 0:
         STOP
 ```
 
-### Step 4a: Code Standards Enforcement
+### Step 4a: Post-Implementation Pipeline
 
-**Why this exists:** TDD workers focus on tests and implementation. This dedicated pass has a single focus: standards compliance.
+When all tasks are complete, run the agents configured in the `post-implementation` phase of `pipeline.md`.
 
-When all tasks are complete:
+**1. Read the pipeline configuration:**
 
-**1. Get the list of changed files:**
+Parse the `## post-implementation` section from the `<pipeline>` context included in CLAUDE.md. Each bullet point is an agent name to run.
+
+**2. Get the list of changed files:**
 ```bash
 git add -A && git diff --name-only --cached && git reset HEAD
 ```
 This temporarily stages everything to get the file list, then unstages. Nothing is committed yet.
 
-**2. Split files into batches** of ~10 files each.
+**3. For each agent in the post-implementation list**, run it with the changed files:
 
-**3. Spawn parallel standards-enforcer subagents** (single message with multiple Task tool calls), one per batch:
+For agents that operate on file batches (like `standards-enforcer`), split files into batches of ~10 and spawn parallel subagents. For agents that operate on the plan as a whole, spawn a single subagent.
 
+**How to determine the agent's mode:** Read the agent's `.md` file. If it references "batch" or "file list" in its prompt format, use batch mode. Otherwise, use single mode.
+
+**Batch mode** (e.g., standards-enforcer):
 ```
-Use the Task tool with subagent_type="standards-enforcer" for EACH batch.
+Use the Task tool with subagent_type="{agent-name}" for EACH batch.
 All Task tool calls MUST be made in a SINGLE message to enable parallel execution.
 ```
 
-**Worker Prompt (per batch):**
+Worker Prompt (per batch):
 
 > **CRITICAL: Pass the COMPLETE, VERBATIM content of the `<code-standards>` and `<testing>` tags above.
 > Do NOT summarize, condense, or paraphrase. The full documents contain nuanced rules
-> (e.g., `@throws` requirements, `readonly` patterns, expectation chaining) that are lost when summarized.
-> Copy-paste the entire content between the tags.**
+> that are lost when summarized. Copy-paste the entire content between the tags.**
 
 ```markdown
 ## Code Standards
@@ -165,13 +169,20 @@ All Task tool calls MUST be made in a SINGLE message to enable parallel executio
 {list of files in this batch, one per line}
 ```
 
-**4. After ALL enforcers return `BATCH_ENFORCED`, run validation:**
+**Single mode** (e.g., doc-updater):
+```
+Use the Task tool with subagent_type="{agent-name}" once.
+```
+
+Pass the plan name, changed files list, and any relevant project context.
+
+**4. After ALL post-implementation agents complete, run validation:**
 ```bash
 # Run full test suite
 {parallel test command from testing.md}
 ```
 
-> **CRITICAL: Nothing is committed until AFTER the full test suite passes.** This ensures no non-standard or broken code is ever committed.
+> **CRITICAL: Nothing is committed until AFTER the full test suite passes.** This ensures no broken code is ever committed.
 
 **5. On tests passing:**
 First, update `_plan.md` status to `completed`. Then stage and commit everything together in a **single commit**:
@@ -179,7 +190,7 @@ First, update `_plan.md` status to `completed`. Then stage and commit everything
 # 1. Update plan status BEFORE committing
 # (edit .claude/plans/{plan-name}/_plan.md — set Status to "completed")
 
-# 2. Stage everything: implementation + standards fixes + plan files (including updated status)
+# 2. Stage everything: implementation + pipeline agent fixes + plan files (including updated status)
 git add -A .claude/plans/{plan-name}/
 git add -A
 git commit -m "feat({plan-name}): {plan title summary}"
@@ -189,16 +200,16 @@ git commit -m "feat({plan-name}): {plan title summary}"
 Output: `ALL_TASKS_COMPLETE`
 
 **6. On test failure:**
-- Revert only the standards enforcer changes to isolate whether they broke things:
+- Revert only the post-implementation agent changes to isolate whether they broke things:
    ```bash
    git stash
    ```
    Re-run the test suite on just the implementation.
-- If implementation tests pass: the standards enforcers broke something. Drop the stash, commit implementation only, and output:
+- If implementation tests pass: a post-implementation agent broke something. Drop the stash, commit implementation only, and output:
    ```
    ALL_TASKS_COMPLETE
 
-   WARNING: Code standards enforcement broke tests. Implementation committed without style fixes. Run linting manually.
+   WARNING: Post-implementation pipeline broke tests. Implementation committed without pipeline fixes. Review and run manually.
    ```
 - If implementation tests also fail: a TDD worker produced broken code. Restore the stash (`git stash pop`) and output `TASKS_BLOCKED` with details.
 
@@ -316,7 +327,7 @@ ALL_TASKS_COMPLETE
 Plan: {plan-name}
 Total tasks: {N}
 All tests passing.
-Code standards enforced.
+Post-implementation pipeline complete.
 Commits created: {N}
 
 ## What Changed

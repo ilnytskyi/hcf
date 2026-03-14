@@ -17,10 +17,10 @@ Create `CLAUDE.md` and all project configuration files in `.claude/` through an 
 First, check if configuration already exists:
 
 ```bash
-ls CLAUDE.md .claude/project-overview.md .claude/testing.md .claude/code-standards.md .claude/architecture.md 2>/dev/null
+ls CLAUDE.md .claude/project-overview.md .claude/testing.md .claude/code-standards.md .claude/architecture.md .claude/pipeline.md 2>/dev/null
 ```
 
-If CLAUDE.md and all 4 config files exist, inform the user:
+If CLAUDE.md and all 5 config files exist, inform the user:
 > Project already configured. CLAUDE.md and config files exist in `.claude/`. To reconfigure, delete CLAUDE.md and `.claude/` then run `/project-setup` again.
 
 Otherwise, continue with setup.
@@ -286,6 +286,27 @@ Example:
 
 *Optional expansions: DI/IoC details, plugin/extension system, event system, routing, configuration, bootstrap process, error handling, versioning strategy.*
 
+**Create `.claude/pipeline.md`:**
+
+Copy the default `pipeline.md` from the HCF plugin into the project's `.claude/` directory. This defines which agents run at each phase of the workflow.
+
+```markdown
+# Pipeline
+
+Configure which agents run at each phase of the development workflow. Each entry is an agent name resolved from the project's `.claude/agents/` directory (local override) or the plugin's `agents/` directory (default).
+
+## post-plan
+- devils-advocate
+
+## post-implementation
+- standards-enforcer
+```
+
+Tell the user:
+> **Pipeline configured** with default agents (devil's advocate + standards enforcer).
+> You can customize `.claude/pipeline.md` to add, remove, or reorder agents at each phase.
+> Custom agents go in `.claude/agents/` — see the HCF README for details.
+
 **Create `CLAUDE.md` in project root:**
 
 This file provides always-on context for every Claude session. Keep it concise (~30-50 lines).
@@ -374,14 +395,16 @@ After creating all files, output:
 ✓ Created .claude/testing.md
 ✓ Created .claude/code-standards.md
 ✓ Created .claude/architecture.md
+✓ Created .claude/pipeline.md
 {✓ Installed ralph-wiggum plugin (if installed)}
 
 Project configured for autonomous development!
 
 Next steps:
 1. Review CLAUDE.md and the generated files in .claude/
-2. Describe a feature to start planning: "Help me implement..."
-3. The plan-create skill will auto-trigger to help you plan
+2. Customize .claude/pipeline.md to add/remove workflow agents
+3. Describe a feature to start planning: "Help me implement..."
+4. The plan-create skill will auto-trigger to help you plan
 ```
 
 ## Error Handling

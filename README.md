@@ -10,6 +10,7 @@ Autonomous development plugin for Claude Code. Define requirements with a PM, th
   - [Quick Start](#quick-start)
 - [How It Works](#how-it-works)
   - [Four Phases](#four-phases)
+  - [Pipeline](#pipeline)
   - [Parallel Execution](#parallel-execution)
   - [TDD Methodology](#tdd-methodology)
 - [Reference](#reference)
@@ -69,7 +70,7 @@ The `plan-create` skill activates automatically to:
 - Break down into tasks with dependencies
 - Write requirements as test descriptions
 - Create `.claude/plans/user-auth/` with task files
-- Run a **devil's advocate** review to find gaps and issues before execution
+- Run **post-plan pipeline** agents (devil's advocate by default) to find gaps before execution
 
 After planning completes, you'll be asked:
 > Ready to begin autonomous implementation?
@@ -100,8 +101,68 @@ ralph-wiggum is prompted during `/project-setup`, or install manually:
 |-------|------|--------------|
 | Setup | One-time | Configure project for autonomous dev |
 | Planning | Interactive | Define tasks with human guidance |
-| Review | Automated | Devil's advocate finds gaps in the plan |
-| Execution | Autonomous | Parallel TDD implementation |
+| Post-Plan Pipeline | Automated | Configurable agents review the plan |
+| Execution | Autonomous | Parallel TDD implementation + post-implementation pipeline |
+
+### Pipeline
+
+The pipeline system controls which agents run before and after the core TDD implementation. It's configured in `.claude/pipeline.md`:
+
+```markdown
+# Pipeline
+
+## post-plan
+- devils-advocate
+
+## post-implementation
+- standards-enforcer
+```
+
+**Phases:**
+
+| Phase | When | Default Agent |
+|-------|------|---------------|
+| `post-plan` | After plan creation, before user review | `devils-advocate` |
+| `post-implementation` | After all TDD workers complete, before commit | `standards-enforcer` |
+
+**Customizing the pipeline:**
+
+Add, remove, or reorder agents at any phase. For example, to add documentation updates and skip standards enforcement:
+
+```markdown
+# Pipeline
+
+## post-plan
+- devils-advocate
+- security-reviewer
+
+## post-implementation
+- doc-updater
+```
+
+**Creating custom agents:**
+
+Create a markdown file in your project's `.claude/agents/` directory:
+
+```
+.claude/agents/doc-updater.md
+```
+
+The agent file follows the standard Claude Code agent format with frontmatter:
+
+```markdown
+---
+name: doc-updater
+description: "Updates documentation when implementation changes."
+model: sonnet
+tools: Read, Edit, Glob, Grep
+---
+
+You are a documentation updater. Your job is to...
+{define the agent's behavior, process, and output format}
+```
+
+The agent name in `pipeline.md` must match the agent's filename (without `.md`). Local agents in `.claude/agents/` override plugin agents with the same name.
 
 ### Parallel Execution
 
@@ -137,6 +198,7 @@ Each task follows strict Red → Green → Refactor:
 | `testing.md` | Test commands, coverage requirements |
 | `code-standards.md` | Linting, formatting rules |
 | `architecture.md` | Directory structure, patterns |
+| `pipeline.md` | Workflow agent configuration |
 
 #### Plans (`.claude/plans/{name}/`)
 
@@ -201,6 +263,7 @@ hcf/
 │   │   └── SKILL.md          # Interactive planning skill (auto-triggers)
 │   └── plan-orchestrate/
 │       └── SKILL.md          # Parallel TDD execution skill (auto-triggers)
+├── pipeline.md               # Default pipeline configuration
 ├── CLAUDE.md                 # Portable CLAUDE.md template for projects
 └── README.md
 ```
