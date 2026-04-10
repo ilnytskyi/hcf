@@ -369,6 +369,8 @@ Would you like to push this branch and create a pull request?
 
 **Never push or create a PR without the user's explicit permission.** Wait for their response before taking action. If they choose option 1, push and use `gh pr create` with a summary derived from the plan objective and "What Changed" section.
 
+**Linking GitHub Issues:** Check `_plan.md` for the `## Related Issues` field. If it contains issue references (e.g., `Closes #18`), include them in the PR body so GitHub automatically links and closes the issues when the PR is merged. Place them at the end of the PR body, each on its own line.
+
 **Blocked:**
 ```
 TASKS_BLOCKED: [003, 007]

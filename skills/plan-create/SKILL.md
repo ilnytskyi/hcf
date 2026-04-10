@@ -33,6 +33,8 @@ Ask clarifying questions, such as (just examples):
 
 Keep questions focused and relevant to the specific feature. Your goal is to flush out all requirements so there is enough information to work on the task autonomously. If you have enough context to work on the feature and don't have any clarifying questions which would further enhance the ask or help define the requirements, continue.
 
+**Issue Detection:** If the user references a GitHub issue (e.g., "#18", "issue 18", a GitHub issue URL), capture it for the `## Related Issues` field in `_plan.md`. Use `Closes #N` for issues that will be fully resolved by this plan, or `Relates to #N` for partial/tangential references. If no issue is mentioned, set the field to "none".
+
 ### Phase 2: Define the Plan
 
 Once you understand the requirements, create the plan overview:
@@ -66,6 +68,9 @@ planning | ready | in_progress | completed | blocked
 
 ## Objective
 {1-2 sentence description of what this plan achieves}
+
+## Related Issues
+{list of GitHub issue references, e.g., "Closes #18", "Relates to #42", or "none"}
 
 ## Scope
 
