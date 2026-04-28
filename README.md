@@ -41,11 +41,12 @@ Execution → Parallel TDD workers implement autonomously
 
 ### Installation
 
-Add the marketplace, then install:
+Add the marketplace, install, then reload:
 
 ```bash
 /plugin marketplace add markshust/hcf
 /plugin install hcf@hcf
+/reload-plugins
 ```
 
 ### Quick Start
