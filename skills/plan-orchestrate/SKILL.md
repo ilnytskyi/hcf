@@ -76,7 +76,7 @@ Before starting execution, check if the ralph-wiggum plugin is installed by look
 
   To install ralph-wiggum for automatic session recovery:
     claude plugin marketplace add anthropics/claude-code
-    claude plugin install ralph-wiggum@anthropics-claude-code
+    claude plugin install ralph-wiggum@claude-code-plugins
 
   Continuing without ralph-wiggum...
   ```

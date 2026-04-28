@@ -97,7 +97,7 @@ After completion, you'll be prompted to push the branch and create a PR (never d
 ralph-wiggum is prompted during `/project-setup`, or install manually:
 ```bash
 /plugin marketplace add anthropics/claude-code
-/plugin install ralph-wiggum@anthropics-claude-code
+/plugin install ralph-wiggum@claude-code-plugins
 ```
 
 ## How It Works

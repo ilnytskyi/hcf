@@ -375,14 +375,14 @@ If yes, run the installation commands:
 /plugin marketplace add anthropics/claude-code
 
 # Install ralph-wiggum
-/plugin install ralph-wiggum@anthropics-claude-code
+/plugin install ralph-wiggum@claude-code-plugins
 ```
 
 If no, inform them they can install later:
 > You can install it anytime with:
 > ```
 > /plugin marketplace add anthropics/claude-code
-> /plugin install ralph-wiggum@anthropics-claude-code
+> /plugin install ralph-wiggum@claude-code-plugins
 > ```
 
 ### Step 8: Confirm Completion
