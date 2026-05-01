@@ -72,8 +72,9 @@ Just describe what you want:
 ```
 
 The `plan-create` skill activates automatically to:
+- **Discover & brainstorm** — explore the codebase and enumerate scope/assumption permutations a senior engineer would catch
 - Create a `feature/{plan-name}` branch for the work
-- Ask clarifying questions about requirements
+- Ask grounded clarifying questions categorized as **must-answer** vs **will-default-if-silent**
 - Break down into tasks with dependencies
 - Write requirements as test descriptions
 - Create `.claude/plans/user-auth/` with task files
@@ -109,7 +110,7 @@ ralph-wiggum is prompted during `/project-setup`, or install manually:
 | Phase | Type | What Happens |
 |-------|------|--------------|
 | Setup | One-time | Configure project for autonomous dev |
-| Planning | Interactive | Define tasks with human guidance |
+| Planning | Interactive | Discover codebase, brainstorm scope, then define tasks with human guidance |
 | Post-Plan Pipeline | Automated | Configurable agents review the plan |
 | Execution | Autonomous | Parallel TDD implementation + post-implementation pipeline |
 
@@ -220,7 +221,6 @@ Each task follows strict Red → Green → Refactor:
 
 | File | Purpose |
 |------|---------|
-| `project-overview.md` | Project name, tech stack |
 | `testing.md` | Test commands, coverage requirements |
 | `code-standards.md` | Linting, formatting rules |
 | `architecture.md` | Directory structure, patterns |
@@ -263,7 +263,7 @@ All skills can be invoked directly with `/skill-name` or triggered automatically
 |-------|------------|---------------|-------------|
 | `project-setup` | `/project-setup` | No | Configure project (one-time) |
 | `project-update` | `/project-update` | No | Sync config with latest plugin defaults |
-| `plan-create` | `/plan-create [description]` | Yes — "Help me implement...", "Build a...", etc. | Interactive planning |
+| `plan-create` | `/plan-create [description]` | Yes — "Build a...", "Let's start building...", "I want an app that...", "Help me implement...", capability lists, etc. | Interactive planning with codebase discovery and grounded clarification |
 | `plan-orchestrate` | `/plan-orchestrate [plan-name]` | Yes — "Run the plan", "Execute", "Start implementation" | Parallel TDD execution |
 
 ### Outputs

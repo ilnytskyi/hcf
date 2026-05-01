@@ -31,6 +31,17 @@ For any feature or request beyond simple ones, use the `hcf:plan-create` skill t
 
 Use this workflow for new features, multi-file changes, or anything requiring multiple steps or tests.
 
+## Release Process
+
+This repo is a Claude Code plugin published via its own marketplace manifest. To cut a release:
+
+1. Bump `version` in **both** `.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json` (must match).
+2. Commit the bump along with any feature changes.
+3. Run `claude plugin tag --push` — this auto-generates a tag in the form `hcf--v{version}` (note the **double dash** between plugin name and `v`) and pushes it to the remote.
+4. Users update via `/plugin install hcf@hcf` and must run `/reload-plugins` for the new version to take effect.
+
+**Versioning:** semver. New phases / agents / skills = minor bump. Removing a generated file (e.g., dropping `project-overview.md` from setup) is treated as minor since existing user data isn't destroyed.
+
 ## Project Details
 
 {Include exact format below with XML tag and @ includes.}

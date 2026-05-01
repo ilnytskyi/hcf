@@ -30,7 +30,6 @@ These are the files that `project-setup` creates. Check which exist:
 | File | Source |
 |------|--------|
 | `CLAUDE.md` | Generated from project context |
-| `.claude/project-overview.md` | Generated from project context |
 | `.claude/testing.md` | Generated from project context |
 | `.claude/code-standards.md` | Generated from project context |
 | `.claude/architecture.md` | Generated from project context |
@@ -62,7 +61,7 @@ For each missing entry, append it to `.gitignore`.
 
 ### Step 5: Check CLAUDE.md References
 
-Read the project's `CLAUDE.md` and verify it references the `.claude/` config files: `project-overview.md`, `testing.md`, `code-standards.md`, and `architecture.md`. Skip `pipeline.md` — it's consumed internally by the HCF plugin, not by Claude directly.
+Read the project's `CLAUDE.md` and verify it references the `.claude/` config files: `testing.md`, `code-standards.md`, and `architecture.md`. Skip `pipeline.md` — it's consumed internally by the HCF plugin, not by Claude directly.
 
 Note any missing references.
 
@@ -75,7 +74,6 @@ HCF Project Update
 
 Files:
   ✓ CLAUDE.md — exists
-  ✗ .claude/project-overview.md — missing
   ✓ .claude/testing.md — exists
   ✓ .claude/code-standards.md — exists
   ✓ .claude/architecture.md — exists
@@ -89,7 +87,6 @@ Pipeline:
   ✓ .claude/ralph-loop.local.md — present
 
 CLAUDE.md References:
-  ✗ project-overview.md — not referenced
   ✓ testing.md — referenced
   ✓ code-standards.md — referenced
   ✓ architecture.md — referenced
@@ -104,7 +101,7 @@ If the user confirms, proceed to Step 7. If everything is current, output "All u
 
 Process each fixable item in order. **Never overwrite existing files. Never modify files without confirmation.**
 
-#### Missing generated files (project-overview, testing, code-standards, architecture)
+#### Missing generated files (testing, code-standards, architecture)
 
 For each missing file, generate it by auto-detecting from the project context — the same approach `project-setup` uses:
 
@@ -139,9 +136,8 @@ After all fixes are applied, output:
 
 ```
 Updates applied:
-  ✓ Created .claude/project-overview.md
+  ✓ Created .claude/architecture.md
   ✓ Added 'standards-enforcer' to post-implementation pipeline phase
-  — Skipped: CLAUDE.md reference for project-overview.md (user action needed)
 
 All done!
 ```

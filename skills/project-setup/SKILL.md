@@ -17,10 +17,10 @@ Create `CLAUDE.md` and all project configuration files in `.claude/` through an 
 First, check if configuration already exists:
 
 ```bash
-ls CLAUDE.md .claude/project-overview.md .claude/testing.md .claude/code-standards.md .claude/architecture.md .claude/pipeline.md 2>/dev/null
+ls CLAUDE.md .claude/testing.md .claude/code-standards.md .claude/architecture.md .claude/pipeline.md 2>/dev/null
 ```
 
-If CLAUDE.md and all 5 config files exist, inform the user:
+If CLAUDE.md and all 4 config files exist, inform the user:
 > Project already configured. CLAUDE.md and config files exist in `.claude/`. To reconfigure, delete CLAUDE.md and `.claude/` then run `/project-setup` again.
 
 Otherwise, continue with setup.
@@ -142,28 +142,6 @@ grep -qxF '.claude/ralph-loop.local.md' .gitignore 2>/dev/null || echo '.claude/
 ```
 
 > **Note**: The templates below show the minimum required sections. Expand each file with additional relevant details based on project complexity. For example, a framework project might include extensive architecture docs, while a simple app might stick closer to the minimum.
-
-**Create `.claude/project-overview.md`:**
-```markdown
-# Project Overview
-
-## Project Name
-{detected or asked project name}
-
-## Description
-{from package.json description, composer.json description, or user input}
-
-## Tech Stack
-- Framework: {framework} {version}
-- Language: {language} {version}
-- Database: {if detected or specified}
-- Key Dependencies: {list major deps}
-
-## Project Type
-{web app | API | CLI tool | library | etc.}
-```
-
-*Optional expansions: Core principles, language-specific features to use, target developers, official resources.*
 
 **Create `.claude/testing.md`:**
 ```markdown
@@ -325,7 +303,7 @@ This file provides always-on context for every Claude session. Keep it concise (
 
 ## Core Principles
 
-{Extract 3-5 key principles from user input or project-overview. These should be always-true rules that affect how code is written.}
+{Extract 3-5 key principles from user input or your judgment. These should be always-true rules that affect how code is written.}
 
 ## Project Structure
 
@@ -351,7 +329,6 @@ This file provides always-on context for every Claude session. Keep it concise (
 ## Detailed Configuration
 
 Project configuration files are in `.claude/`:
-- `project-overview.md` - Project identity and philosophy
 - `architecture.md` - Technical patterns and structure
 - `testing.md` - Test configuration and commands
 - `code-standards.md` - Coding conventions
@@ -391,7 +368,6 @@ After creating all files, output:
 
 ```
 ✓ Created CLAUDE.md
-✓ Created .claude/project-overview.md
 ✓ Created .claude/testing.md
 ✓ Created .claude/code-standards.md
 ✓ Created .claude/architecture.md

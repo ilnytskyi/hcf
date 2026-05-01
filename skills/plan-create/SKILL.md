@@ -1,6 +1,6 @@
 ---
 name: plan-create
-description: Create structured implementation plans for autonomous TDD development. Use for new features, multi-file changes, or anything requiring multiple steps or tests. Triggers on "build", "create", "add a feature", "help me implement", "I need to build". Do NOT use this for "implement the plan" or "run the plan" - those should use plan-orchestrate instead. Skip for quick bug fixes, single-line changes, questions, or documentation.
+description: Create structured implementation plans for autonomous TDD development. Use for new features, multi-file changes, or anything requiring multiple steps or tests. Triggers on aspirational openers ("let's build", "let's start building", "I want to make", "I want an app that", "help me build"), capability lists ("users should be able to X, Y, Z"), vague-noun patterns ("a system for", "a way to", "an app that", "functionality for"), and explicit build verbs ("build", "create", "add a feature", "help me implement", "I need to build"). Do NOT use this for "implement the plan" or "run the plan" - those should use plan-orchestrate instead. Skip for quick bug fixes, single-line changes, questions, or documentation.
 argument-hint: "[feature description]"
 ---
 
@@ -16,26 +16,73 @@ Transform feature requests into structured plans with task breakdowns, dependenc
 
 ## Execution Flow
 
-### Phase 1: Understand the Request
+### Phase 1: Discovery & Assumption Brainstorm
 
-**Initial Clarification**
+Approach this phase like a solution architect meeting with a client to flush out scope and requirements. Your job is not to ask everything — it's to think hard about the shape of the solution before asking grounded questions. Find the integration points, then enumerate the design axes the user probably hasn't thought about.
 
-Start by understanding the scope:
+**Quick scope check first.** If the ask already specifies data model, scope boundaries, and integration points (e.g., "Add an `email_verified_at` column to users and a `SendVerificationEmail` job"), do a brief existence-check (do the named files/models exist?) and skip ahead to Phase 2 — the brainstorm below is for under-specified asks.
 
-> I'll help you plan this feature. Let me ask a few questions to make sure I understand what you need.
+**1. Codebase discovery**
 
-Ask clarifying questions, such as (just examples):
-1. **Scope**: What's the core functionality? What's explicitly out of scope?
-2. **Users**: Who will use this? What permissions/roles are involved?
-3. **Integration**: How does this connect to existing code?
-4. **Edge cases**: Any specific error handling or edge cases to consider?
-5. **Priority**: Which parts are must-have vs nice-to-have?
+Read files specifically related to the ask. Architecture context is already loaded via the `<architecture>` block at the top of this skill — do not re-read `.claude/architecture.md`. Instead:
+- Glob for domain-related files (e.g., for "track books", look for `book*`, `*Book*`, library/reading-list files)
+- Read existing models, controllers, or components that overlap with the ask
+- Note existing patterns the new feature must conform to or extend
+- Identify what's already built vs. greenfield
 
-Keep questions focused and relevant to the specific feature. Your goal is to flush out all requirements so there is enough information to work on the task autonomously. If you have enough context to work on the feature and don't have any clarifying questions which would further enhance the ask or help define the requirements, continue.
+**2. Permutation & assumption brainstorm**
+
+For each noun and verb in the ask, enumerate plausible interpretations. Then enumerate the **hidden axes** — design decisions the user almost certainly hasn't specified but the implementer needs to know. Surface the non-obvious ones a senior engineer would catch and a junior would miss.
+
+Focus on permutations that meaningfully change **scope, data model, or architecture**. Avoid minutiae (button colors, naming bikesheds, trivial config defaults).
+
+Example for "track books I'm reading":
+- **Book schema**: title only? +author/ISBN/cover/genre/pages/publication date?
+- **List structure**: one global list, or multiple states ("want to read", "reading", "finished")?
+- **"Finished" semantics**: boolean state, dated event, or reversible?
+- **Hidden axes the ask didn't mention**: auth/multi-user, persistence layer, edit/delete operations, search/filter/sort, ratings/notes, web vs mobile UI, external lookups (ISBN APIs).
+
+**3. Diff against codebase**
+
+Produce a short "what I found vs. what you asked" comparison. Examples:
+- "You have a `User` model with auth — books would extend it for per-user lists"
+- "No models exist yet — this is greenfield"
+- "Your existing controllers follow a `ResourceController` pattern; book routes would conform"
 
 **Issue Detection:** If the user references a GitHub issue (e.g., "#18", "issue 18", a GitHub issue URL), capture it for the `## Related Issues` field in `_plan.md`. Use `Closes #N` for issues that will be fully resolved by this plan, or `Relates to #N` for partial/tangential references. If no issue is mentioned, set the field to "none".
 
-### Phase 2: Define the Plan
+### Phase 2: Grounded Clarification
+
+Surface findings to the user, then ask categorized questions. The goal is to flush out enough to write a confident plan — like a solution architect leaving a client meeting with the spec they need.
+
+**Format your response so users can skim past findings if they want — the Questions section must be self-sufficient.**
+
+Present in this order:
+
+> **What I Found**
+> - {codebase findings: existing models, patterns, integration points, greenfield vs. extension}
+>
+> **Key Permutations to Resolve**
+> {1-3 sentences naming the design axes that meaningfully shape scope/data model/architecture, derived from the brainstorm}
+>
+> **Questions**
+>
+> *Must answer (these shape scope, data model, or architecture):*
+> 1. {scope-shaping question}
+> 2. {data-model question}
+> 3. {integration question}
+>
+> *Will default if you don't specify (defaults stated):*
+> - {dimension}: {proposed default}
+> - {dimension}: {proposed default}
+
+**Question quality guidance:**
+- No hard cap on count — some plans need many questions, some need few. Ask as many as warranted.
+- Stay focused on **scope, data model, integration, and architecture**. Skip minutiae (UI colors, exact field names, naming bikesheds, trivial config).
+- Each "must answer" should be a decision that, if assumed wrong, would force a rewrite. Each "will default" should be safe to assume with a stated default the user can override.
+- If the Phase 1 quick scope check determined the ask was already concrete, skip to Phase 3 with no questions asked.
+
+### Phase 3: Define the Plan
 
 Once you understand the requirements, create the plan overview:
 
@@ -72,6 +119,9 @@ planning | ready | in_progress | completed | blocked
 ## Related Issues
 {list of GitHub issue references, e.g., "Closes #18", "Relates to #42", or "none"}
 
+## Discovery Notes
+{Brief summary of Phase 1 findings: existing models/patterns to extend, integration points, greenfield vs. existing code, key assumptions resolved during clarification. Captures context for future readers and resumed sessions.}
+
 ## Scope
 
 ### In Scope
@@ -100,7 +150,7 @@ planning | ready | in_progress | completed | blocked
 - {potential risk}: {mitigation strategy}
 ```
 
-### Phase 3: Break Down into Tasks
+### Phase 4: Break Down into Tasks
 
 Create numbered task files. Follow these principles:
 
@@ -153,14 +203,14 @@ Write requirements as exact test names. These become the test method names.
 (Left blank - filled in by programmer during implementation)
 ```
 
-### Phase 4: Validate Dependencies
+### Phase 5: Validate Dependencies
 
 After creating all tasks, verify:
 1. No circular dependencies exist
 2. Task 001 has no dependencies (or minimal bootstrap)
 3. Dependencies form a valid DAG (Directed Acyclic Graph)
 4. Maximum parallelism is achieved
-5. All context exists to complete all tasks autonomously (if not, revisit asking clarifying questions)
+5. All context exists to complete all tasks autonomously (if not, revisit Phase 2 for additional clarifying questions)
 
 **Dependency Visualization:**
 Show the user a simple dependency tree:
@@ -172,7 +222,7 @@ Show the user a simple dependency tree:
      └─► 004 ────► 006
 ```
 
-### Phase 5: Run Post-Plan Pipeline
+### Phase 6: Run Post-Plan Pipeline
 
 After validating dependencies, run all agents configured in the `post-plan` phase of `pipeline.md`.
 
@@ -203,7 +253,7 @@ Use the Agent tool with `subagent_type="{agent-name}"` and pass the plan name an
 
 Users can add, remove, or reorder agents in their project's `.claude/pipeline.md`. For example, adding a `security-reviewer` agent after `devils-advocate`.
 
-### Phase 6: Review with User
+### Phase 7: Review with User
 
 Present the refined plan along with what the devil's advocate changed:
 
@@ -240,7 +290,7 @@ Present the refined plan along with what the devil's advocate changed:
 
 Make adjustments based on feedback.
 
-### Phase 7: Finalize
+### Phase 8: Finalize
 
 Once approved:
 
